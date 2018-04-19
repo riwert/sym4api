@@ -8,28 +8,57 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Post;
+use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Pagerfanta\Pagerfanta;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @Route("/api")
+ */
 class PostController
 {
+    private $limit = 10;
+
     /**
-     * @Route("/posts")
+     * @Route("/posts", name="post_list")
      * @Method({"GET"})
      */
-    public function index(EntityManagerInterface $entityManager)
+    public function index(Request $request, UrlGeneratorInterface $router, EntityManagerInterface $entityManager)
     {
-        $posts = $entityManager->getRepository(Post::class)->findAll();
+        $page = $request->query->get('page', 1);
 
-        $posts = array_map(function($post) {
-            return $post->toArray();
-        }, $posts);
+        $queryBuilder = $entityManager->getRepository(Post::class)->findAllQueryBuilder();
 
-        $data = [
+        $adapter = new DoctrineORMAdapter($queryBuilder);
+        $pagerfanta = new Pagerfanta($adapter);
+        $pagerfanta->setMaxPerPage($this->limit);
+        $pagerfanta->setCurrentPage($page);
+
+        $posts = [];
+        foreach ($pagerfanta->getCurrentPageResults() as $post) {
+            $posts[] = $post->toArray();
+        }
+
+        $self = $router->generate('post_list', ['page' => $page]);
+        $first = $router->generate('post_list', ['page' => 1]);
+        $last = $router->generate('post_list', ['page' => $pagerfanta->getNbPages()]);
+        $next = ($pagerfanta->hasNextPage()) ? $router->generate('post_list', ['page' => $pagerfanta->getNextPage()]) : null;
+        $prev = ($pagerfanta->hasPreviousPage()) ? $router->generate('post_list', ['page' => $pagerfanta->getPreviousPage()]) : null;
+
+        $response = [
             'data' => [
                 'posts' => $posts,
             ],
+            'total' => $pagerfanta->getNbResults(),
+            'count' => count($posts),
+            'self' => $self,
+            'first' => $first,
+            'last' => $last,
+            'next' => $next,
+            'prev' => $prev,
         ];
 
-        return new JsonResponse($data);
+        return new JsonResponse($response);
     }
 
     /**

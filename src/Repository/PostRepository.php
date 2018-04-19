@@ -18,6 +18,11 @@ class PostRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Post::class);
     }
+    
+    public function findAllQueryBuilder()
+    {
+        return $this->createQueryBuilder('post');
+    }
 
 //    /**
 //     * @return Post[] Returns an array of Post objects
