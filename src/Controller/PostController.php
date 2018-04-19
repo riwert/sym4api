@@ -62,7 +62,7 @@ class PostController
     }
 
     /**
-     * @Route("/posts/{id}")
+     * @Route("/posts/{id}", name="post_show")
      * @Method({"GET"})
      */
     public function show($id, EntityManagerInterface $entityManager)
@@ -85,7 +85,7 @@ class PostController
     }
 
     /**
-     * @Route("/posts")
+     * @Route("/posts", name="post_store")
      * @Method({"POST"})
      */
     public function store(Request $request, EntityManagerInterface $entityManager)
@@ -109,7 +109,7 @@ class PostController
     }
 
     /**
-     * @Route("/posts/{id}")
+     * @Route("/posts/{id}", name="post_update")
      * @Method({"PATCH"})
      */
     public function update($id, Request $request, EntityManagerInterface $entityManager)
@@ -144,7 +144,7 @@ class PostController
     }
 
     /**
-     * @Route("/posts/{id}")
+     * @Route("/posts/{id}", name="post_destroy")
      * @Method({"DELETE"})
      */
     public function destroy($id, Request $request, EntityManagerInterface $entityManager)
