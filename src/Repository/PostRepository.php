@@ -21,7 +21,7 @@ class PostRepository extends ServiceEntityRepository
     
     public function findAllQueryBuilder()
     {
-        return $this->createQueryBuilder('post');
+        return $this->createQueryBuilder('Post');
     }
 
 //    /**
