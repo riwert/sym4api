@@ -135,7 +135,9 @@ class PostController
         $entityManager->flush();
 
         $data = [
-            'data' => $post->toArray(),
+            'data' => [
+                'post' => $post->toArray(),
+            ],
         ];
 
         return new JsonResponse($data);
@@ -161,7 +163,9 @@ class PostController
         $entityManager->flush();
 
         $data = [
-            'data' => $post->toArray(),
+            'data' => [
+                'post' => $post->toArray(),
+            ],
         ];
 
         return new JsonResponse($data);
