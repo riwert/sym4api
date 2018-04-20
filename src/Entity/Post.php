@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -43,15 +45,25 @@ class Post
     private $publishedAt;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $deletedAt;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="posts")
      * @ORM\JoinColumn(nullable=true)
      */
     private $category;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\ManyToMany(targetEntity="App\Entity\Tag", mappedBy="posts")
      */
-    private $deletedAt;
+    private $tags;
+
+    public function __construct()
+    {
+        $this->tags = new ArrayCollection();
+    }
 
     public function getId()
     {
@@ -207,6 +219,34 @@ class Post
     }
 
     /**
+     * @return Collection|Tag[]
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+    public function addTag(Tag $tag): self
+    {
+        if (!$this->tags->contains($tag)) {
+            $this->tags[] = $tag;
+            $tag->addPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag): self
+    {
+        if ($this->tags->contains($tag)) {
+            $this->tags->removeElement($tag);
+            $tag->removePost($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * Update Timestamps
      *
      * @ORM\PrePersist
@@ -226,6 +266,13 @@ class Post
      */
     public function toArray($eager = true)
     {
+        $tags = [];
+        if ($eager) {
+            foreach ($this->getTags() as $tag) {
+                $tags[] = $tag->toArray(false);
+            }
+        }
+
         return [
             'id' => $this->getId(),
             'title' => $this->getTitle(),
@@ -237,6 +284,8 @@ class Post
             'is_published' => $this->isPublished(),
             'is_deleted' => $this->isDeleted(),
             'category' => ($this->getCategory() && $eager) ? $this->getCategory()->toArray(false) : null,
+            'tags_count' => count($this->getTags()),
+            'tags' => $tags,
         ];
     }
 }

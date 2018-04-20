@@ -2,15 +2,14 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
- * @ORM\HasLifecycleCallbacks
+ * @ORM\Entity(repositoryClass="App\Repository\TagRepository")
  */
-class Category
+class Tag
 {
     /**
      * @ORM\Id()
@@ -23,11 +22,6 @@ class Category
      * @ORM\Column(type="string", length=255)
      */
     private $name;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $description;
 
     /**
      * @ORM\Column(type="datetime")
@@ -45,7 +39,7 @@ class Category
     private $deletedAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="category")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Post", inversedBy="tags")
      */
     private $posts;
 
@@ -67,18 +61,6 @@ class Category
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
 
         return $this;
     }
@@ -137,9 +119,8 @@ class Category
 
     public function addPost(Post $post): self
     {
-        if (! $this->posts->contains($post)) {
+        if (!$this->posts->contains($post)) {
             $this->posts[] = $post;
-            $post->setCategory($this);
         }
 
         return $this;
@@ -149,27 +130,9 @@ class Category
     {
         if ($this->posts->contains($post)) {
             $this->posts->removeElement($post);
-            if ($post->getCategory() === $this) {
-                $post->setCategory(null);
-            }
         }
 
         return $this;
-    }
-
-    /**
-     * Update Timestamps
-     *
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
-     */
-    public function updatedTimestamps()
-    {
-        $this->setUpdatedAt(new \DateTime('now'));
-
-        if ($this->getCreatedAt() == null) {
-            $this->setCreatedAt(new \DateTime('now'));
-        }
     }
 
     /**
@@ -187,7 +150,6 @@ class Category
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
-            'description' => $this->getDescription(),
             'created_at' => $this->getCreatedAt(),
             'updated_at' => $this->getUpdatedAt(),
             'deleted_at' => $this->getDeletedAt(),
