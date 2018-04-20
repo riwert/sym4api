@@ -39,23 +39,32 @@ class PostController
             $posts[] = $post->toArray();
         }
 
-        $self = $router->generate('post_list', ['page' => $page]);
-        $first = $router->generate('post_list', ['page' => 1]);
-        $last = $router->generate('post_list', ['page' => $pagerfanta->getNbPages()]);
-        $next = ($pagerfanta->hasNextPage()) ? $router->generate('post_list', ['page' => $pagerfanta->getNextPage()]) : null;
-        $prev = ($pagerfanta->hasPreviousPage()) ? $router->generate('post_list', ['page' => $pagerfanta->getPreviousPage()]) : null;
+        $self = $router->generate('post_list', ['page' => $page], UrlGeneratorInterface::ABSOLUTE_URL);
+        $first = $router->generate('post_list', ['page' => 1], UrlGeneratorInterface::ABSOLUTE_URL);
+        $last = $router->generate('post_list', ['page' => $pagerfanta->getNbPages()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $next = ($pagerfanta->hasNextPage()) ? $router->generate('post_list', ['page' => $pagerfanta->getNextPage()], UrlGeneratorInterface::ABSOLUTE_URL) : null;
+        $prev = ($pagerfanta->hasPreviousPage()) ? $router->generate('post_list', ['page' => $pagerfanta->getPreviousPage()], UrlGeneratorInterface::ABSOLUTE_URL) : null;
 
-        $response = [
-            'data' => [
-                'posts' => $posts,
-            ],
-            'total' => $pagerfanta->getNbResults(),
-            'count' => count($posts),
-            'self' => $self,
+        $data = $posts;
+
+        $links = [            
             'first' => $first,
             'last' => $last,
             'next' => $next,
             'prev' => $prev,
+        ];
+
+        $meta = [
+            'limit' => $this->limit,
+            'total' => $pagerfanta->getNbResults(),
+            'count' => count($posts),
+            'self' => $self,
+        ];
+
+        $response = [
+            'data' => $data,
+            'links' => $links,
+            'meta' => $meta,            
         ];
 
         return new JsonResponse($response);

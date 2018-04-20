@@ -158,7 +158,7 @@ class Post
      */
     public function isPublished()
     {
-        return $this->publishedAt <= new \DateTime('now');
+        return $this->publishedAt && $this->publishedAt <= new \DateTime('now');
     }
 
     /**
@@ -215,6 +215,10 @@ class Post
             'body' => $this->body,
             'created_at' => $this->createdAt,
             'updated_at' => $this->updatedAt,
+            'published_at' => $this->publishedAt,
+            'deleted_at' => $this->deletedAt,
+            'is_published' => $this->isPublished(),
+            'is_deleted' => $this->isDeleted(),
         ];
     }
 }
