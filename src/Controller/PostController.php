@@ -12,6 +12,7 @@ use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use App\Entity\Post;
 use App\Entity\Category;
+use App\Entity\Tag;
 
 /**
  * @Route("/api")
@@ -108,6 +109,32 @@ class PostController
         $post->setTitle($content->title);
         $post->setBody($content->body);
 
+        if (! empty($content->category)) {
+            $category = $entityManager->getRepository(Category::class)->findOneById($content->category);
+
+            if (! $category) {
+                throw new NotFoundHttpException(
+                    'Category not found for ID ' . $content->category
+                );
+            }
+
+            $post->setCategory($category);
+        }
+
+        if (! empty($content->tags)) {
+            foreach ($content->tags as $tagId) {
+                $tag = $entityManager->getRepository(Tag::class)->findOneById($tagId);
+
+                if (! $tag) {
+                    throw new NotFoundHttpException(
+                        'Tag not found for ID ' . $tagId
+                    );
+                }
+
+                $post->addTag($tag);
+            }
+        }
+
         $entityManager->persist($post);
         $entityManager->flush();
 
@@ -152,6 +179,26 @@ class PostController
             }
 
             $post->setCategory($category);
+        }
+        if (isset($content->tags)) {
+            // Remove existing tags
+            foreach ($post->getTags() as $tag) {
+                $post->removeTag($tag);
+            }
+        }    
+        if (! empty($content->tags)) {
+            // Add new tags
+            foreach ($content->tags as $tagId) {
+                $tag = $entityManager->getRepository(Tag::class)->findOneById($tagId);
+
+                if (! $tag) {
+                    throw new NotFoundHttpException(
+                        'Tag not found for ID ' . $tagId
+                    );
+                }
+
+                $post->addTag($tag);
+            }
         }
 
         $entityManager->persist($post);

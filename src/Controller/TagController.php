@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use App\Entity\Tag;
+use App\Entity\Post;
 
 /**
  * @Route("/api")
@@ -50,7 +51,7 @@ class TagController
             'tags' => $tags,
         ];
 
-        $links = [            
+        $links = [
             'first' => $first,
             'last' => $last,
             'next' => $next,
@@ -67,7 +68,7 @@ class TagController
         $response = [
             'data' => $data,
             'links' => $links,
-            'meta' => $meta,            
+            'meta' => $meta,
         ];
 
         return new JsonResponse($response);
@@ -106,7 +107,19 @@ class TagController
 
         $tag = new Tag();
         $tag->setName($content->name);
-        $tag->setDescription($content->description);
+        if (! empty($content->posts)) {
+            foreach ($content->posts as $postId) {
+                $post = $entityManager->getRepository(Post::class)->findOneById($postId);
+
+                if (! $post) {
+                    throw new NotFoundHttpException(
+                        'Post not found for ID ' . $postId
+                    );
+                }
+
+                $tag->addPost($post);
+            }
+        }
 
         $entityManager->persist($tag);
         $entityManager->flush();
@@ -139,8 +152,25 @@ class TagController
         if (! empty($content->name)) {
             $tag->setName($content->name);
         }
-        if (! empty($content->body)) {
-            $tag->setDescription($content->description);
+        if (isset($content->posts)) {
+            // Remove existing posts
+            foreach ($tag->getPosts() as $post) {
+                $tag->removePost($post);
+            }
+        }
+        if (! empty($content->posts)) {            
+            // Add new posts
+            foreach ($content->posts as $postId) {
+                $post = $entityManager->getRepository(Post::class)->findOneById($postId);
+
+                if (! $post) {
+                    throw new NotFoundHttpException(
+                        'Post not found for ID ' . $postId
+                    );
+                }
+
+                $tag->addPost($post);
+            }
         }
 
         $entityManager->persist($tag);
