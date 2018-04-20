@@ -135,6 +135,28 @@ class Category
         return $this->posts;
     }
 
+    public function addPost(Post $post): self
+    {
+        if (! $this->posts->contains($post)) {
+            $this->posts[] = $post;
+            $post->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(Post $post): self
+    {
+        if ($this->posts->contains($post)) {
+            $this->posts->removeElement($post);
+            if ($post->getCategory() === $this) {
+                $post->setCategory(null);
+            }
+        }
+
+        return $this;
+    }
+
     /**
      * Update Timestamps
      *
