@@ -224,7 +224,7 @@ class Post
     /**
      * Object to array
      */
-    public function toArray()
+    public function toArray($eager = true)
     {
         return [
             'id' => $this->getId(),
@@ -236,7 +236,7 @@ class Post
             'deleted_at' => $this->getDeletedAt(),
             'is_published' => $this->isPublished(),
             'is_deleted' => $this->isDeleted(),
-            'category' => ($this->getCategory()) ? $this->getCategory()->toArray() : null,
+            'category' => ($this->getCategory() && $eager) ? $this->getCategory()->toArray(false) : null,
         ];
     }
 }

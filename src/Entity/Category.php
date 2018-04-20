@@ -153,8 +153,15 @@ class Category
     /**
      * Object to array
      */
-    public function toArray()
+    public function toArray($eagar = true)
     {
+        $posts = [];
+        if ($eagar) {
+            foreach ($this->getPosts() as $post) {
+                $posts[] = $post->toArray(false);
+            }
+        }
+
         return [
             'id' => $this->getId(),
             'name' => $this->getName(),
@@ -163,6 +170,8 @@ class Category
             'updated_at' => $this->getUpdatedAt(),
             'deleted_at' => $this->getDeletedAt(),
             'is_deleted' => $this->isDeleted(),
+            'posts_count' => count($this->getPosts()),
+            'posts' => $posts,
         ];
     }
 }

@@ -18,10 +18,20 @@ class PostRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Post::class);
     }
-    
+
     public function findAllQueryBuilder()
     {
-        return $this->createQueryBuilder('Post');
+        return $this->createQueryBuilder('p');
+    }
+
+    public function findAllAvailableQueryBuilder()
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.publishedAt <= :now')
+            ->setParameter('now', new \DateTime('now'))
+            ->andWhere('p.deletedAt IS NULL')
+            ->addOrderBy('p.publishedAt', 'DESC')
+            ->addOrderBy('p.createdAt', 'DESC');
     }
 
 //    /**
