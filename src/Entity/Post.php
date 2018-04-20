@@ -43,10 +43,15 @@ class Post
     private $publishedAt;
 
     /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Category", inversedBy="posts")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $category;
+
+    /**
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $deletedAt;
-
 
     public function getId()
     {
@@ -189,6 +194,18 @@ class Post
         return $this->deletedAt != null;
     }
 
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
     /**
      * Update Timestamps
      *
@@ -205,20 +222,21 @@ class Post
     }
 
     /**
-     * To array
+     * Object to array
      */
     public function toArray()
     {
         return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'body' => $this->body,
-            'created_at' => $this->createdAt,
-            'updated_at' => $this->updatedAt,
-            'published_at' => $this->publishedAt,
-            'deleted_at' => $this->deletedAt,
+            'id' => $this->getId(),
+            'title' => $this->getTitle(),
+            'body' => $this->getBody(),
+            'created_at' => $this->getCreatedAt(),
+            'updated_at' => $this->getUpdatedAt(),
+            'published_at' => $this->getPublishedAt(),
+            'deleted_at' => $this->getDeletedAt(),
             'is_published' => $this->isPublished(),
             'is_deleted' => $this->isDeleted(),
+            'category' => ($this->getCategory()) ? $this->getCategory()->toArray() : null,
         ];
     }
 }

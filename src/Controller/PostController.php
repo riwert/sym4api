@@ -45,7 +45,9 @@ class PostController
         $next = ($pagerfanta->hasNextPage()) ? $router->generate('post_list', ['page' => $pagerfanta->getNextPage()], UrlGeneratorInterface::ABSOLUTE_URL) : null;
         $prev = ($pagerfanta->hasPreviousPage()) ? $router->generate('post_list', ['page' => $pagerfanta->getPreviousPage()], UrlGeneratorInterface::ABSOLUTE_URL) : null;
 
-        $data = $posts;
+        $data = [
+            'posts' => $posts,
+        ];
 
         $links = [            
             'first' => $first,
@@ -84,13 +86,13 @@ class PostController
             );
         }
 
-        $data = [
+        $response = [
             'data' => [
                 'post' => $post->toArray(),
             ],
         ];
 
-        return new JsonResponse($data);
+        return new JsonResponse($response);
     }
 
     /**
@@ -108,13 +110,13 @@ class PostController
         $entityManager->persist($post);
         $entityManager->flush();
 
-        $data = [
+        $response = [
             'data' => [
                 'post' => $post->toArray(),
             ],
         ];
 
-        return new JsonResponse($data);
+        return new JsonResponse($response);
     }
 
     /**
@@ -143,13 +145,13 @@ class PostController
         $entityManager->persist($post);
         $entityManager->flush();
 
-        $data = [
+        $response = [
             'data' => [
                 'post' => $post->toArray(),
             ],
         ];
 
-        return new JsonResponse($data);
+        return new JsonResponse($response);
     }
 
     /**
@@ -171,12 +173,12 @@ class PostController
         $entityManager->remove($post);
         $entityManager->flush();
 
-        $data = [
+        $response = [
             'data' => [
                 'post' => $post->toArray(),
             ],
         ];
 
-        return new JsonResponse($data);
+        return new JsonResponse($response);
     }
 }
