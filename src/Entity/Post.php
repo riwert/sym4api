@@ -37,6 +37,16 @@ class Post
      */
     private $updatedAt;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $publishedAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $deletedAt;
+
 
     public function getId()
     {
@@ -85,7 +95,7 @@ class Post
 
     /**
      * Get the value of createdAt
-     */ 
+     */
     public function getCreatedAt()
     {
         return $this->createdAt;
@@ -95,7 +105,7 @@ class Post
      * Set the value of createdAt
      *
      * @return  self
-     */ 
+     */
     public function setCreatedAt($createdAt)
     {
         $this->createdAt = $createdAt;
@@ -105,7 +115,7 @@ class Post
 
     /**
      * Get the value of updatedAt
-     */ 
+     */
     public function getUpdatedAt()
     {
         return $this->updatedAt;
@@ -115,14 +125,70 @@ class Post
      * Set the value of updatedAt
      *
      * @return  self
-     */ 
+     */
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
 
         return $this;
     }
-    
+
+    /**
+     * Get the value of publishedAt
+     */
+    public function getPublishedAt()
+    {
+        return $this->publishedAt;
+    }
+
+    /**
+     * Set the value of publishedAt
+     *
+     * @return  self
+     */
+    public function setPublishedAt($publishedAt)
+    {
+        $this->publishedAt = $publishedAt;
+
+        return $this;
+    }
+
+    /**
+     * Check if is published now
+     */
+    public function isPublished()
+    {
+        return $this->publishedAt <= new \DateTime('now');
+    }
+
+    /**
+     * Get the value of deletedAt
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * Set the value of deletedAt
+     *
+     * @return  self
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    /**
+     * Check if is deleted
+     */
+    public function isDeleted()
+    {
+        return $this->deletedAt != null;
+    }
+
     /**
      * Update Timestamps
      *
