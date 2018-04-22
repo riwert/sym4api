@@ -122,7 +122,7 @@ class CategoryController
 
     /**
      * @Route("/categories/{id}", name="category_update")
-     * @Method({"PATCH"})
+     * @Method({"PUT", "PATCH"})
      */
     public function update($id, Request $request, EntityManagerInterface $entityManager)
     {

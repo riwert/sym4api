@@ -149,7 +149,7 @@ class PostController
 
     /**
      * @Route("/posts/{id}", name="post_update")
-     * @Method({"PATCH"})
+     * @Method({"PUT", "PATCH"})     
      */
     public function update($id, Request $request, EntityManagerInterface $entityManager)
     {
